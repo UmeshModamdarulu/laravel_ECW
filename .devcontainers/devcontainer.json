@@ -27,30 +27,27 @@
             "version": "lts"
         },
         // Git LFS for handling large files in Git.
-        "ghcr.io/devcontainers/features/git-lfs:1": {},
-        // MySQL Client for interacting with the MariaDB database from the app container.
-        "ghcr.io/devcontainers/features/mysql-client:1": {}
+        "ghcr.io/devcontainers/features/git-lfs:1": {}
+        // The mysql-client feature was here, but we removed it to fix the error.
     },
 
     // Use 'postCreateCommand' to run commands after the container is created.
-    // This automates Laravel setup: symlinking public, installing Composer/NPM dependencies,
-    // building assets, linking storage, and setting permissions.
     "postCreateCommand": "/bin/bash .devcontainer/post-create.sh",
 
     // Configure tool-specific properties for VS Code.
     "customizations": {
         "vscode": {
             "extensions": [
-                "bmewburn.vscode-intelephense-client", // PHP IntelliSense
-                "Laravel.laravel-blade-spacer",        // Blade template support
-                "onecentlin.laravel5-snippets",         // Laravel snippets
-                "MehediDracula.php-namespace-resolver", // PHP Namespace Resolver
-                "ikappas.phpcs",                        // PHP CodeSniffer
-                "calebporzio.project-snippets",         // Project specific snippets
-                "esbenp.prettier-vscode",               // Code formatter
-                "dbaeumer.vscode-eslint",               // JavaScript linter
-                "formulahendry.auto-rename-tag",        // Auto rename HTML/Blade tags
-                "CoenraadS.bracket-pair-colorizer-2"    // Bracket pair colorizer
+                "bmewburn.vscode-intelephense-client",
+                "Laravel.laravel-blade-spacer",
+                "onecentlin.laravel5-snippets",
+                "MehediDracula.php-namespace-resolver",
+                "ikappas.phpcs",
+                "calebporzio.project-snippets",
+                "esbenp.prettier-vscode",
+                "dbaeumer.vscode-eslint",
+                "formulahendry.auto-rename-tag",
+                "CoenraadS.bracket-pair-colorizer-2"
             ],
             "settings": {
                 "php.validate.executablePath": "/usr/bin/php",
@@ -62,7 +59,5 @@
             }
         }
     },
-
-    // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-    // "remoteUser": "root"
+    "remoteUser": "root"
 }
