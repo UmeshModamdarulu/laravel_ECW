@@ -5,7 +5,7 @@
     "context": ".."
   },
   "workspaceFolder": "/var/www/html",
-  "remoteUser": "www-data",
+  "remoteUser": "vscode",
   "postCreateCommand": "chmod +x .devcontainer/init.sh && .devcontainer/init.sh",
   "forwardPorts": [8000, 3306, 6379, 8025, 8080],
   "customizations": {
