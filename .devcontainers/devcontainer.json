@@ -1,0 +1,68 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/php-mariadb
+{
+    "name": "Laravel Development Environment",
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "app",
+    "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+
+    // Forward ports for Laravel, MariaDB, PhpMyAdmin, and MailHog
+    "forwardPorts": [
+        8080, // Laravel web server (Apache/PHP-FPM)
+        3306, // MariaDB
+        8000, // PhpMyAdmin UI
+        8025  // MailHog UI
+    ],
+
+    // Features to add to the dev container.
+    "features": {
+        // PHP feature: Installs Composer, Xdebug, and common PHP tools.
+        "ghcr.io/devcontainers/features/php:1": {
+            "version": "8.2",
+            "installComposer": true,
+            "installXdebug": true
+        },
+        // Node.js feature: Installs Node.js and NPM for front-end development.
+        "ghcr.io/devcontainers/features/node:1": {
+            "version": "lts"
+        },
+        // Git LFS for handling large files in Git.
+        "ghcr.io/devcontainers/features/git-lfs:1": {},
+        // MySQL Client for interacting with the MariaDB database from the app container.
+        "ghcr.io/devcontainers/features/mysql-client:1": {}
+    },
+
+    // Use 'postCreateCommand' to run commands after the container is created.
+    // This automates Laravel setup: symlinking public, installing Composer/NPM dependencies,
+    // building assets, linking storage, and setting permissions.
+    "postCreateCommand": "/bin/bash .devcontainer/post-create.sh",
+
+    // Configure tool-specific properties for VS Code.
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "bmewburn.vscode-intelephense-client", // PHP IntelliSense
+                "Laravel.laravel-blade-spacer",        // Blade template support
+                "onecentlin.laravel5-snippets",         // Laravel snippets
+                "MehediDracula.php-namespace-resolver", // PHP Namespace Resolver
+                "ikappas.phpcs",                        // PHP CodeSniffer
+                "calebporzio.project-snippets",         // Project specific snippets
+                "esbenp.prettier-vscode",               // Code formatter
+                "dbaeumer.vscode-eslint",               // JavaScript linter
+                "formulahendry.auto-rename-tag",        // Auto rename HTML/Blade tags
+                "CoenraadS.bracket-pair-colorizer-2"    // Bracket pair colorizer
+            ],
+            "settings": {
+                "php.validate.executablePath": "/usr/bin/php",
+                "files.associations": {
+                    "*.blade.php": "html"
+                },
+                "editor.formatOnSave": true,
+                "editor.defaultFormatter": "esbenp.prettier-vscode"
+            }
+        }
+    },
+
+    // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+    // "remoteUser": "root"
+}
