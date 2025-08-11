@@ -1,6 +1,8 @@
 FROM php:8.2-fpm
 
 # Install system dependencies
+RUN groupadd -g 1000 vscode && useradd -m -u 1000 -g vscode vscode
+
 RUN apt-get update && apt-get install -y \
     git \
     curl \
