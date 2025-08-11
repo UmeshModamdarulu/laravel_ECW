@@ -1,88 +1,41 @@
-version: '3.9'
+version: "3.9"
 
 services:
   app:
     build:
       context: .
-      dockerfile: .devcontainer/Dockerfile
-    container_name: laravel-app
-    volumes:
-      - ../:/var/www/html:cached
+      dockerfile: Dockerfile
+    container_name: laravel_app
+    restart: unless-stopped
     ports:
-      - "8000:8000" # Laravel
-      - "5173:5173" # Vite
-    environment:
-      - DB_HOST=mysql
-      - DB_PORT=3306
-      - REDIS_HOST=redis
-      - MAIL_HOST=mailhog
-      - APP_URL=http://0.0.0.0:8000
-      - VITE_HOST=0.0.0.0
+      - "8000:8000"
+    volumes:
+      - .:/var/www/html
     depends_on:
-      - mysql
-      - redis
-      - mailhog
-    networks:
-      - laravel-network
-    command: >
-      sh -c "php artisan config:clear &&
-             php artisan cache:clear &&
-             php artisan route:clear &&
-             php artisan serve --host=0.0.0.0 --port=8000"
+      - db
+    command: sh -c "composer install && php artisan key:generate && php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8000"
 
-  mysql:
+  db:
     image: mysql:8.0
-    container_name: mysql-db
-    restart: always
+    container_name: laravel_db
+    restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: laravel
-      MYSQL_USER: laraveluser
-      MYSQL_PASSWORD: secret
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: laravel
     ports:
       - "3306:3306"
     volumes:
-      - mysql-data:/var/lib/mysql
-    networks:
-      - laravel-network
+      - dbdata:/var/lib/mysql
 
-  redis:
-    image: redis:7-alpine
-    container_name: redis-cache
-    ports:
-      - "6379:6379"
-    networks:
-      - laravel-network
-
-  mailhog:
-    image: mailhog/mailhog
-    container_name: mailhog
-    ports:
-      - "8025:8025"
-      - "1025:1025"
-    environment:
-      - MH_UI_WEB_PATH=/mailhog
-    networks:
-      - laravel-network
-
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: phpmyadmin
-    restart: always
-    ports:
-      - "8080:80"
-    environment:
-      PMA_HOST: mysql
-      PMA_PORT: 3306
-      PMA_ARBITRARY: 1
-    depends_on:
-      - mysql
-    networks:
-      - laravel-network
+  node:
+    image: node:20
+    container_name: laravel_node
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+    command: sh -c "npm install && npm run dev -- --host"
 
 volumes:
-  mysql-data:
-
-networks:
-  laravel-network:
-    driver: bridge
+  dbdata:
