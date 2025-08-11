@@ -1,25 +1,20 @@
 {
-  "name": "Laravel Dev Container",
-  "dockerComposeFile": "docker-compose.yml",
+  "name": "Laravel App",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
   "service": "app",
   "workspaceFolder": "/var/www/html",
   "remoteUser": "www-data",
-  "runServices": ["app", "mysql", "redis", "mailhog", "phpmyadmin"],
   "postCreateCommand": "chmod +x .devcontainer/init.sh && .devcontainer/init.sh",
-  "postStartCommand": "php artisan migrate --force",
+  "forwardPorts": [8000, 3306, 6379, 8025, 8080],
   "customizations": {
     "vscode": {
       "extensions": [
-        "bradlc.vscode-laravel-blade",
         "bmewburn.vscode-intelephense-php",
-        "ms-azuretools.vscode-docker"
+        "bradlc.vscode-laravel-blade"
       ]
     }
-  },
-  "forwardPorts": [8000, 3306, 6379, 8025, 8080],
-  "onAutoForwardError": "notify",
-  "build": {
-    "dockerfile": "Dockerfile",
-    "context": "."
   }
 }
