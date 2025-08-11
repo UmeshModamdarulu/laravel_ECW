@@ -24,7 +24,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 
 # Copy Composer files
-COPY composer.json composer.lock ./?
+COPY composer.json composer.lock ./
 RUN composer install --no-dev --no-scripts --no-progress --no-suggest --optimize-autoloader && \
     composer clear-cache
 
