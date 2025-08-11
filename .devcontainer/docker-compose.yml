@@ -9,12 +9,15 @@ services:
     volumes:
       - ../:/var/www/html:cached
     ports:
-      - "8000:8000"
+      - "8000:8000" # Laravel
+      - "5173:5173" # Vite
     environment:
       - DB_HOST=mysql
       - DB_PORT=3306
       - REDIS_HOST=redis
       - MAIL_HOST=mailhog
+      - APP_URL=http://0.0.0.0:8000
+      - VITE_HOST=0.0.0.0
     depends_on:
       - mysql
       - redis
