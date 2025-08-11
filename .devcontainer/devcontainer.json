@@ -1,0 +1,26 @@
+{
+  "name": "Laravel Dev Container",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/var/www/html",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "lts"
+    }
+  },
+  "remoteUser": "www-data",
+  "postCreateCommand": "chmod +x /var/www/html/.devcontainer/init.sh && /var/www/html/.devcontainer/init.sh",
+  "postStartCommand": "php artisan migrate --force && php artisan config:cache",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "bradlc.vscode-laravel-blade",
+        "bmewburn.vscode-intelephense-php",
+        "ms-azuretools.vscode-docker",
+        "esbenp.prettier-vscode"
+      ]
+    }
+  },
+  "forwardPorts": [8000, 3306, 6379, 8025, 8080],
+  "onAutoForwardError": "notify"
+}
