@@ -1,47 +1,36 @@
-FROM php:8.2-fpm
+# Use official PHP 8.2 image with Apache
+FROM php:8.2-apache
 
-# Install system dependencies
-RUN groupadd -g 1000 vscode && useradd -m -u 1000 -g vscode vscode
-RUN chown -R vscode:vscode /var/www/html
-
+# Install system dependencies & PHP extensions required by Laravel
 RUN apt-get update && apt-get install -y \
     git \
-    curl \
+    unzip \
+    libzip-dev \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
-    zip \
-    unzip \
-    vim \
-    nano \
-    supervisor \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    curl \
+    nodejs \
+    npm \
+    && docker-php-ext-install pdo_mysql zip gd mbstring exif pcntl bcmath
 
-# Install PHP extensions
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd sockets
+# Enable Apache mod_rewrite for Laravel
+RUN a2enmod rewrite
 
-# Get Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# Install Composer
+COPY --from=composer:2.7 /usr/bin/composer /usr/bin/composer
 
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy composer files only if they exist
-# This avoids COPY errors during initial build
-COPY ./composer.json ./composer.lock* ./
+# Copy existing application files (optional for first build)
+COPY . .
 
-# Install PHP dependencies (as root to avoid permission errors)
-RUN composer install --no-dev --no-scripts --no-progress --no-suggest --optimize-autoloader || true \
-    && composer clear-cache || true
+# Give proper permissions for Laravel storage and bootstrap cache
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Copy init script
-COPY .devcontainer/init.sh .devcontainer/init.sh
-
-# Change ownership to www-data
-RUN chown -R www-data:www-data /var/www/html
-
-# Switch to www-data user for security
-USER www-data
-
+# Expose port
 EXPOSE 8000
-CMD ["php-fpm"]
+
+# Start Apache in foreground (Laravel dev server runs separately via docker-compose)
+CMD ["apache2-foreground"]
