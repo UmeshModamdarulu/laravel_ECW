@@ -3,24 +3,23 @@
   "dockerComposeFile": "docker-compose.yml",
   "service": "app",
   "workspaceFolder": "/var/www/html",
-  "features": {
-    "ghcr.io/devcontainers/features/node:1": {
-      "version": "lts"
-    }
-  },
   "remoteUser": "www-data",
-  "postCreateCommand": "chmod +x /var/www/html/.devcontainer/init.sh && /var/www/html/.devcontainer/init.sh",
-  "postStartCommand": "php artisan migrate --force && php artisan config:cache",
+  "runServices": ["app", "mysql", "redis", "mailhog", "phpmyadmin"],
+  "postCreateCommand": "chmod +x .devcontainer/init.sh && .devcontainer/init.sh",
+  "postStartCommand": "php artisan migrate --force",
   "customizations": {
     "vscode": {
       "extensions": [
         "bradlc.vscode-laravel-blade",
         "bmewburn.vscode-intelephense-php",
-        "ms-azuretools.vscode-docker",
-        "esbenp.prettier-vscode"
+        "ms-azuretools.vscode-docker"
       ]
     }
   },
   "forwardPorts": [8000, 3306, 6379, 8025, 8080],
-  "onAutoForwardError": "notify"
+  "onAutoForwardError": "notify",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "."
+  }
 }
