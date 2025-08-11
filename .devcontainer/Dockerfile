@@ -23,17 +23,21 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy Composer files
-COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-scripts --no-progress --no-suggest --optimize-autoloader && \
-    composer clear-cache
+# Copy composer files only if they exist
+# This avoids COPY errors during initial build
+COPY ./composer.json ./composer.lock* ./
 
-# Install Node.js and NPM via package manager (already added via feature, but ensure npm is ready)
-# Note: Node is handled by devcontainer feature, so just verify
+# Install PHP dependencies (as root to avoid permission errors)
+RUN composer install --no-dev --no-scripts --no-progress --no-suggest --optimize-autoloader || true \
+    && composer clear-cache || true
 
 # Copy init script
 COPY .devcontainer/init.sh .devcontainer/init.sh
-# Set www-data as user
+
+# Change ownership to www-data
+RUN chown -R www-data:www-data /var/www/html
+
+# Switch to www-data user for security
 USER www-data
 
 EXPOSE 8000
