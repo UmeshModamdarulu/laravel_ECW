@@ -32,7 +32,7 @@ RUN composer install --no-dev --no-scripts --no-progress --no-suggest --optimize
 # Note: Node is handled by devcontainer feature, so just verify
 
 # Copy init script
-COPY .devcontainer/init.sh /var/www/html/.devcontainer/init.sh
+COPY .devcontainer/init.sh .devcontainer/init.sh
 # Set www-data as user
 USER www-data
 
