@@ -1,41 +1,27 @@
-version: "3.9"
+version: '3.8'
 
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: laravel_app
-    restart: unless-stopped
-    ports:
-      - "8000:8000"
+    image: mcr.microsoft.com/devcontainers/base:alpine
     volumes:
-      - .:/var/www/html
-    depends_on:
-      - db
-    command: sh -c "composer install && php artisan key:generate && php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8000"
+      - ..:/workspaces:cached
+    command: sleep infinity
 
   db:
     image: mysql:8.0
-    container_name: laravel_db
-    restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: laravel
-      MYSQL_USER: laravel
-      MYSQL_PASSWORD: laravel
+      MYSQL_USER: laravel_user
+      MYSQL_PASSWORD: password
     ports:
       - "3306:3306"
     volumes:
-      - dbdata:/var/lib/mysql
-
-  node:
-    image: node:20
-    container_name: laravel_node
-    working_dir: /var/www/html
-    volumes:
-      - .:/var/www/html
-    command: sh -c "npm install && npm run dev -- --host"
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
 
 volumes:
-  dbdata:
+  db_data:

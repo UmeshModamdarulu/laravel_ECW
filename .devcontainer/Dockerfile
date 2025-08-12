@@ -1,36 +1,43 @@
-# Use official PHP 8.2 image with Apache
-FROM php:8.2-apache
+version: "3.8"
 
-# Install system dependencies & PHP extensions required by Laravel
-RUN apt-get update && apt-get install -y \
-    git \
-    unzip \
-    libzip-dev \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    curl \
-    nodejs \
-    npm \
-    && docker-php-ext-install pdo_mysql zip gd mbstring exif pcntl bcmath
+services:
+  laravel:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: laravel_app
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      - mysql
+    environment:
+      - DB_CONNECTION=mysql
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=laravel
+      - DB_USERNAME=laravel
+      - DB_PASSWORD=secret
+    command: >
+      sh -c "composer install &&
+             php artisan key:generate &&
+             php artisan migrate &&
+             php artisan serve --host=0.0.0.0 --port=8000"
 
-# Enable Apache mod_rewrite for Laravel
-RUN a2enmod rewrite
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_db
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: laravel
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: rootpassword
+    volumes:
+      - mysql_data:/var/lib/mysql
 
-# Install Composer
-COPY --from=composer:2.7 /usr/bin/composer /usr/bin/composer
-
-# Set working directory
-WORKDIR /var/www/html
-
-# Copy existing application files (optional for first build)
-COPY . .
-
-# Give proper permissions for Laravel storage and bootstrap cache
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-
-# Expose port
-EXPOSE 8000
-
-# Start Apache in foreground (Laravel dev server runs separately via docker-compose)
-CMD ["apache2-foreground"]
+volumes:
+  mysql_data:
