@@ -1,17 +1,35 @@
 {
-  "name": "Laravel Dev Container",
+  "name": "Laravel with MySQL, Redis & phpMyAdmin",
   "dockerComposeFile": "docker-compose.yml",
   "service": "app",
-  "workspaceFolder": "/workspaces/laravel_ECW",
-
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   "features": {
-    "ghcr.io/devcontainers-contrib/features/php": {
-      "version": "8.3"
-    },
-    "ghcr.io/devcontainers-contrib/features/composer": "latest",
-    "ghcr.io/devcontainers/features/node": "latest",
-    "ghcr.io/devcontainers/features/git": "latest"
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "lts"
+    }
   },
-
-  "postCreateCommand": "composer install && npm install"
+  "remoteUser": "vscode",
+  "forwardPorts": [8000, 8080, 3306, 6379],
+  "postCreateCommand": "composer install && cp .env.example .env && echo 'DB_HOST=mysql' >> .env && echo 'DB_PORT=3306' >> .env && echo 'DB_DATABASE=laravel' >> .env && echo 'DB_USERNAME=root' >> .env && echo 'DB_PASSWORD=password' >> .env && echo 'REDIS_HOST=redis' >> .env && echo 'REDIS_PASSWORD=password' >> .env && php artisan key:generate",
+  "postStartCommand": "php artisan serve --host=0.0.0.0 --port=8000 > /dev/null 2>&1 &",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "bradgarropy.vscode-laravel-blade",
+        "onecentlin.laravel5-snippets",
+        "bmewburn.vscode-intelephense-php",
+        "ms-azuretools.vscode-docker"
+      ]
+    }
+  },
+  "portsAttributes": {
+    "8000": {
+      "label": "Laravel Application",
+      "onAutoForward": "notify"
+    },
+    "8080": {
+      "label": "phpMyAdmin",
+      "onAutoForward": "notify"
+    }
+  }
 }

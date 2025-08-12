@@ -2,26 +2,61 @@ version: '3.8'
 
 services:
   app:
-    image: mcr.microsoft.com/devcontainers/base:alpine
+    image: mcr.microsoft.com/devcontainers/php:8.2
+    ports:
+      - "8000"
     volumes:
-      - ..:/workspaces:cached
+      - ../..:/workspaces:cached
+    privileged: true
+    init: true
     command: sleep infinity
+    depends_on:
+      - mysql
+      - redis
 
-  db:
+  mysql:
     image: mysql:8.0
     environment:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: laravel
-      MYSQL_USER: laravel_user
-      MYSQL_PASSWORD: password
     ports:
-      - "3306:3306"
+      - "3306"
     volumes:
-      - db_data:/var/lib/mysql
+      - mysql-data:/var/lib/mysql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      timeout: 20s
+      timeout: 10s
       retries: 10
 
+  redis:
+    image: redis:alpine
+    command: ["redis-server", "--requirepass", "password"]
+    environment:
+      REDIS_PASSWORD: password
+    ports:
+      - "6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      timeout: 3s
+      retries: 10
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: password
+      UPLOAD_LIMIT: 100M
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
 volumes:
-  db_data:
+  mysql-data:
